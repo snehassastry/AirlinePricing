@@ -37,5 +37,9 @@ def convert_plot_to_base64(fig):
     encoded = base64.b64encode(buf.read()).decode('utf-8')
     return f'data:image/png;base64,{encoded}'
 
+import os
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
