@@ -2,69 +2,64 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Airline Overbooking Model</title>
+  <title>Airline Overbooking Optimization</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f9;
+      background-color: #eaf3fc;
       margin: 0;
       padding: 0;
     }
 
     .container {
-      max-width: 90%;
-      margin: 30px auto;
+      max-width: 1000px;
+      margin: 40px auto;
       background-color: white;
-      padding: 25px 40px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px 50px 40px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     }
 
     h2 {
       text-align: center;
-      color: #333;
-      margin-bottom: 20px;
+      color: #2c3e50;
+      margin-bottom: 25px;
     }
 
-    .form-row {
-      display: flex;
+    .form-grid {
+      display: grid;
+      grid-template-columns: 260px 180px 260px 180px;
+      gap: 10px 10px;
       align-items: center;
-      margin-bottom: 12px;
-      gap: 12px;
     }
 
-    .form-row label {
-      width: 320px;
+    label {
       font-weight: 500;
-      color: #444;
+      color: #333;
       text-align: right;
-      padding-right: 8px;
+      margin-right: 8px;
     }
 
-    .form-row input {
-      flex: 1;
-      padding: 8px 10px;
+    input,
+    select {
+      padding: 7px 9px;
+      font-size: 14px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      font-size: 14px;
-    }
-
-    .double-input {
-      display: flex;
-      gap: 12px;
-      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     button {
+      margin-top: 25px;
       width: 100%;
       padding: 12px;
       background-color: #007BFF;
       color: white;
-      border: none;
       font-size: 16px;
+      border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
     }
 
     button:hover {
@@ -73,80 +68,76 @@
 
     .results {
       margin-top: 30px;
-      padding: 18px;
-      background-color: #f1f5fb;
+      padding: 20px;
+      background-color: #f1f8ff;
       border-radius: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>✈️ Airline Booking Parameter Form</h2>
+    <h2>✈️ Airline Overbooking Optimization</h2>
     <form method="POST">
-
-      <div class="form-row">
+      <div class="form-grid">
         <label>Days to Departure</label>
         <input type="number" name="time_steps" value="{{ form_values.time_steps or 365 }}">
-      </div>
-
-      <div class="form-row">
-        <label>Coach Seats (with Max Overbooking)</label>
-        <div class="double-input">
-          <input type="number" name="n_seats_coach" value="{{ form_values.n_seats_coach or 100 }}" placeholder="Seats">
-          <input type="number" name="overbook_coach" value="{{ form_values.overbook_coach or 5 }}" placeholder="Overbooking">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <label>Coach Price - High (with Probability)</label>
-        <div class="double-input">
-          <input type="number" name="price_coach_high" value="{{ form_values.price_coach_high or 350 }}">
-          <input type="text" name="prob_coach_high" value="{{ form_values.prob_coach_high or 0.30 }}" placeholder="Prob.">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <label>Coach Price - Low (with Probability)</label>
-        <div class="double-input">
-          <input type="number" name="price_coach_low" value="{{ form_values.price_coach_low or 300 }}">
-          <input type="text" name="prob_coach_low" value="{{ form_values.prob_coach_low or 0.65 }}" placeholder="Prob.">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <label>First Class Seats (No Overbooking)</label>
-        <input type="number" name="n_seats_first" value="{{ form_values.n_seats_first or 20 }}">
-      </div>
-
-      <div class="form-row">
-        <label>First Class Price - High (with Probability)</label>
-        <div class="double-input">
-          <input type="number" name="price_first_high" value="{{ form_values.price_first_high or 500 }}">
-          <input type="text" name="prob_first_high" value="{{ form_values.prob_first_high or 0.04 }}" placeholder="Prob.">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <label>First Class Price - Low (with Probability)</label>
-        <div class="double-input">
-          <input type="number" name="price_first_low" value="{{ form_values.price_first_low or 425 }}">
-          <input type="text" name="prob_first_low" value="{{ form_values.prob_first_low or 0.08 }}" placeholder="Prob.">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <label>Show-Up Probability (Coach)</label>
-        <input type="text" name="showup_prob_coach" value="{{ form_values.showup_prob_coach or 0.95 }}">
-      </div>
-
-      <div class="form-row">
-        <label>If First Class is sold out, boost coach sale demand by</label>
-        <input type="text" name="coach_price_boost" value="{{ form_values.coach_price_boost or 0.03 }}">
-      </div>
-
-      <div class="form-row">
         <label>Discount Rate</label>
         <input type="text" name="discount" value="{{ form_values.discount or 0.99954 }}">
+
+        <label>Coach Seats</label>
+        <input type="number" name="n_seats_coach" value="{{ form_values.n_seats_coach or 100 }}">
+        <label>Overbooking Limit</label>
+        <input type="number" name="overbook_coach" value="{{ form_values.overbook_coach or 5 }}">
+
+        <label>Coach Price (High)</label>
+        <input type="number" name="price_coach_high" value="{{ form_values.price_coach_high or 350 }}">
+        <label>Sell Probability</label>
+        <input type="text" name="prob_coach_high" value="{{ form_values.prob_coach_high or 0.30 }}">
+
+        <label>Coach Price (Low)</label>
+        <input type="number" name="price_coach_low" value="{{ form_values.price_coach_low or 300 }}">
+        <label>Sell Probability</label>
+        <input type="text" name="prob_coach_low" value="{{ form_values.prob_coach_low or 0.65 }}">
+
+        <label>Coach Showup Prob.</label>
+        <input type="text" name="showup_prob_coach" value="{{ form_values.showup_prob_coach or 0.95 }}">
+        <label>First Class Showup Prob.</label>
+        <input type="text" name="showup_prob_first" value="{{ form_values.showup_prob_first or 0.90 }}">
+
+        <label>First Class Seats</label>
+        <input type="number" name="n_seats_first" value="{{ form_values.n_seats_first or 20 }}">
+        <div></div><div></div>
+
+        <label>First Class Price (High)</label>
+        <input type="number" name="price_first_high" value="{{ form_values.price_first_high or 500 }}">
+        <label>Sell Probability</label>
+        <input type="text" name="prob_first_high" value="{{ form_values.prob_first_high or 0.04 }}">
+
+        <label>First Class Price (Low)</label>
+        <input type="number" name="price_first_low" value="{{ form_values.price_first_low or 425 }}">
+        <label>Sell Probability</label>
+        <input type="text" name="prob_first_low" value="{{ form_values.prob_first_low or 0.08 }}">
+
+        <label>Boost Coach Buy (%)</label>
+        <input type="text" name="coach_price_boost" value="{{ form_values.coach_price_boost or 0.03 }}">
+        <div></div><div></div>
+
+        <label>Upgrade Cost to First Class</label>
+        <input type="text" name="cost_upgrade" value="{{ form_values.cost_upgrade or 30 }}">
+        <label>Deboard Cost</label>
+        <input type="text" name="cost_off" value="{{ form_values.cost_off or 100 }}">
+
+        <label>Seasonality (T/F)</label>
+        <select name="apply_seasonality">
+          <option value="True" {% if form_values.apply_seasonality == 'True' %}selected{% endif %}>True</option>
+          <option value="False" {% if form_values.apply_seasonality == 'False' %}selected{% endif %}>False</option>
+        </select>
+
+        <label>Option to Not Sell Coach (T/F)</label>
+        <select name="has_option_to_not_sell">
+          <option value="True" {% if form_values.has_option_to_not_sell == 'True' %}selected{% endif %}>True</option>
+          <option value="False" {% if form_values.has_option_to_not_sell == 'False' %}selected{% endif %}>False</option>
+        </select>
       </div>
 
       <button type="submit">Render Results 📊</button>
@@ -156,7 +147,6 @@
     <div class="results">
       <h3>📊 Model Results</h3>
       <p>{{ result }}</p>
-    
       {% if graph_url %}
         <img src="{{ graph_url }}" alt="Model Output Graph" style="max-width:100%; border-radius: 8px; margin-top: 20px;">
       {% endif %}
