@@ -6,7 +6,7 @@ This project explores **dynamic pricing** and **overbooking optimization** for a
 
 By modeling customer behavior, seat constraints, and overbooking penalties, the project simulates and evaluates multiple pricing policies and overbooking scenarios to identify the most profitable strategy.
 
-📁 **Files Included**
+**Files Included**
 - `Airlines(DP).ipynb`: Python notebook implementing the DP logic and simulations.
 - `AirlinePricing.pdf`: Detailed report explaining the problem, model, assumptions, methodology, and results.
 - `app.py`: Flask web app for interactive overbooking optimization.
@@ -17,7 +17,7 @@ By modeling customer behavior, seat constraints, and overbooking penalties, the 
 
 ---
 
-## 💡 Objective
+## Objective
 
 Maximize total expected profit over a year by:
 - Setting daily prices for coach and first-class tickets.
@@ -27,7 +27,7 @@ Maximize total expected profit over a year by:
 
 ---
 
-## 🔧 Model Components
+## Model Components
 
 - **State Variables**: Days until flight, coach seats sold, first-class seats sold.
 - **Decision Variables**: Prices for coach and first-class tickets ($300/$350 and $425/$500).
@@ -40,7 +40,7 @@ Maximize total expected profit over a year by:
 
 ---
 
-## 📊 Key Features
+## Key Features
 
 ### 1. Dynamic Programming Framework
 - Uses **backward induction** and the **Bellman Equation**.
@@ -64,7 +64,7 @@ Maximize total expected profit over a year by:
 
 ---
 
-## 🌐 Interactive Web App (Flask)
+## Interactive Web App (Flask)
 
 We built a **Flask web app** to allow users to interactively test different overbooking configurations and instantly visualize:
 
@@ -86,11 +86,11 @@ python app.py
 ```
 Then open `http://127.0.0.1:5000/` in your browser.
 
-> 🛠️ The app was also deployed on Render: .
+>  The app was also deployed on Render: https://airlinepricing.onrender.com
 
 ---
 
-## 🧪 Simulation Metrics
+## Simulation Metrics
 
 - **Expected Profit & Std. Deviation**
 - **Overbooking Rate**
@@ -100,7 +100,7 @@ Then open `http://127.0.0.1:5000/` in your browser.
 
 ---
 
-## ✅ Results Summary
+## Results Summary
 
 | Policy                                | Overbooking | Profit ($)   | % Gain from Baseline |
 |--------------------------------------|-------------|--------------|----------------------|
@@ -111,13 +111,13 @@ Then open `http://127.0.0.1:5000/` in your browser.
 
 ---
 
-## 📝 Final Recommendation
+## Final Recommendation
 
 Allow **up to 20 overbooked coach seats** and **enable the no-sell option** for coach class during low-demand days. Include **seasonality** in the model for realistic demand trends.
 
 ---
 
-## 🚀 Future Scope
+## Future Scope
 
 - Incorporate competitor pricing
 - Support multi-leg/connecting flights
@@ -126,11 +126,11 @@ Allow **up to 20 overbooked coach seats** and **enable the no-sell option** for 
 
 ---
 
-## 👩‍💻 Authors
+## Authors
 
 - Austin Yeh  
 - Felipe Zapater  
 - Sonali Hornick  
 - Sneha Sastry Rayadurgam  
 
-📍 Project for **Optimization II**, University of Texas at Austin, Spring 2025.
+Project for **Optimization II**, University of Texas at Austin, Spring 2025.
