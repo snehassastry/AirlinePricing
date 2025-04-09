@@ -1,4 +1,4 @@
-ffrom flask import Flask, render_template, request, stream_with_context, Response
+from flask import Flask, render_template, request, stream_with_context, Response
 import matplotlib.pyplot as plt
 import io
 import base64
