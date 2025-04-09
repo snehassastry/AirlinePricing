@@ -106,8 +106,8 @@ Then open `http://127.0.0.1:5000/` in your browser.
 |--------------------------------------|-------------|--------------|----------------------|
 | No Seasonality, No No-Sell           | 9 seats     | 42,134.62    | 3.64%                |
 | No Seasonality, With No-Sell         | 20 seats    | 42,139.89    | 3.65%                |
-| Seasonality, No No-Sell              | 9 seats     | 41,820.96    | 3.64%                |
-| Seasonality, With No-Sell (best-fit) | 20 seats    | 41,826.45    | 3.65%                |
+| Seasonality, No No-Sell              | 9 seats     | 41,820.96    | 3.65%                |
+| Seasonality, With No-Sell (best-fit) | 20 seats    | 41,826.45    | 3.66%                |
 
 ---
 
