@@ -15,7 +15,7 @@
       max-width: 1000px;
       margin: 40px auto;
       background-color: white;
-      padding: 30px 50px 40px;
+      padding: 30px 50px;
       border-radius: 14px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     }
@@ -66,92 +66,155 @@
       background-color: #0056b3;
     }
 
-    .results {
+    .results, .log-box {
       margin-top: 30px;
       padding: 20px;
       background-color: #f1f8ff;
       border-radius: 10px;
+    }
+
+    .log-box {
+      background-color: #fffbe6;
+      border: 1px solid #f0e6a6;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+
+    table.summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+
+    table.summary-table th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    table.summary-table th {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    img.plot {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>✈️ Airline Overbooking Optimization</h2>
-    <form method="POST">
+    <form id="main-form">
       <div class="form-grid">
+        {% macro val(name) -%}{{ form_values.get(name, '') }}{%- endmacro %}
+        {% set required = 'required' %}
+
         <label>Days to Departure</label>
-        <input type="number" name="time_steps" value="{{ form_values.time_steps or 365 }}">
+        <input name="time_steps" type="number" {{ required }} value="{{ val('time_steps') }}">
         <label>Discount Rate</label>
-        <input type="text" name="discount" value="{{ form_values.discount or 0.99954 }}">
+        <input name="discount" type="text" {{ required }} value="{{ val('discount') }}">
 
         <label>Coach Seats</label>
-        <input type="number" name="n_seats_coach" value="{{ form_values.n_seats_coach or 100 }}">
+        <input name="n_seats_coach" type="number" {{ required }} value="{{ val('n_seats_coach') }}">
         <label>Overbooking Limit</label>
-        <input type="number" name="overbook_coach" value="{{ form_values.overbook_coach or 5 }}">
+        <input name="overbook_coach" type="number" {{ required }} value="{{ val('overbook_coach') }}">
 
         <label>Coach Price (High)</label>
-        <input type="number" name="price_coach_high" value="{{ form_values.price_coach_high or 350 }}">
+        <input name="price_coach_high" type="number" {{ required }} value="{{ val('price_coach_high') }}">
         <label>Sell Probability</label>
-        <input type="text" name="prob_coach_high" value="{{ form_values.prob_coach_high or 0.30 }}">
+        <input name="prob_coach_high" type="text" {{ required }} value="{{ val('prob_coach_high') }}">
 
         <label>Coach Price (Low)</label>
-        <input type="number" name="price_coach_low" value="{{ form_values.price_coach_low or 300 }}">
+        <input name="price_coach_low" type="number" {{ required }} value="{{ val('price_coach_low') }}">
         <label>Sell Probability</label>
-        <input type="text" name="prob_coach_low" value="{{ form_values.prob_coach_low or 0.65 }}">
+        <input name="prob_coach_low" type="text" {{ required }} value="{{ val('prob_coach_low') }}">
 
         <label>Coach Showup Prob.</label>
-        <input type="text" name="showup_prob_coach" value="{{ form_values.showup_prob_coach or 0.95 }}">
+        <input name="showup_prob_coach" type="text" {{ required }} value="{{ val('showup_prob_coach') }}">
         <label>First Class Showup Prob.</label>
-        <input type="text" name="showup_prob_first" value="{{ form_values.showup_prob_first or 0.90 }}">
+        <input name="showup_prob_first" type="text" {{ required }} value="{{ val('showup_prob_first') }}">
 
         <label>First Class Seats</label>
-        <input type="number" name="n_seats_first" value="{{ form_values.n_seats_first or 20 }}">
+        <input name="n_seats_first" type="number" {{ required }} value="{{ val('n_seats_first') }}">
         <div></div><div></div>
 
         <label>First Class Price (High)</label>
-        <input type="number" name="price_first_high" value="{{ form_values.price_first_high or 500 }}">
+        <input name="price_first_high" type="number" {{ required }} value="{{ val('price_first_high') }}">
         <label>Sell Probability</label>
-        <input type="text" name="prob_first_high" value="{{ form_values.prob_first_high or 0.04 }}">
+        <input name="prob_first_high" type="text" {{ required }} value="{{ val('prob_first_high') }}">
 
         <label>First Class Price (Low)</label>
-        <input type="number" name="price_first_low" value="{{ form_values.price_first_low or 425 }}">
+        <input name="price_first_low" type="number" {{ required }} value="{{ val('price_first_low') }}">
         <label>Sell Probability</label>
-        <input type="text" name="prob_first_low" value="{{ form_values.prob_first_low or 0.08 }}">
+        <input name="prob_first_low" type="text" {{ required }} value="{{ val('prob_first_low') }}">
 
         <label>Boost Coach Buy (%)</label>
-        <input type="text" name="coach_price_boost" value="{{ form_values.coach_price_boost or 0.03 }}">
+        <input name="coach_price_boost" type="text" {{ required }} value="{{ val('coach_price_boost') }}">
         <div></div><div></div>
 
-        <label>Upgrade Cost to First Class</label>
-        <input type="text" name="cost_upgrade" value="{{ form_values.cost_upgrade or 30 }}">
+        <label>Upgrade Cost</label>
+        <input name="cost_upgrade" type="text" {{ required }} value="{{ val('cost_upgrade') }}">
         <label>Deboard Cost</label>
-        <input type="text" name="cost_off" value="{{ form_values.cost_off or 100 }}">
+        <input name="cost_off" type="text" {{ required }} value="{{ val('cost_off') }}">
 
-        <label>Seasonality (T/F)</label>
-        <select name="apply_seasonality">
-          <option value="True" {% if form_values.apply_seasonality == 'True' %}selected{% endif %}>True</option>
-          <option value="False" {% if form_values.apply_seasonality == 'False' %}selected{% endif %}>False</option>
+        <label>Seasonality</label>
+        <select name="apply_seasonality" {{ required }}>
+          <option value="True" {% if form_values.get('apply_seasonality') == 'True' %}selected{% endif %}>True</option>
+          <option value="False" {% if form_values.get('apply_seasonality') == 'False' %}selected{% endif %}>False</option>
         </select>
 
-        <label>Option to Not Sell Coach (T/F)</label>
-        <select name="has_option_to_not_sell">
-          <option value="True" {% if form_values.has_option_to_not_sell == 'True' %}selected{% endif %}>True</option>
-          <option value="False" {% if form_values.has_option_to_not_sell == 'False' %}selected{% endif %}>False</option>
+        <label>Option to Not Sell Coach</label>
+        <select name="has_option_to_not_sell" {{ required }}>
+          <option value="True" {% if form_values.get('has_option_to_not_sell') == 'True' %}selected{% endif %}>True</option>
+          <option value="False" {% if form_values.get('has_option_to_not_sell') == 'False' %}selected{% endif %}>False</option>
         </select>
       </div>
 
       <button type="submit">Render Results 📊</button>
     </form>
 
-    {% if result %}
-    <div class="results">
-      <h3>📊 Model Results</h3>
-      <p>{{ result }}</p>
-      {% if graph_url %}
-        <img src="{{ graph_url }}" alt="Model Output Graph" style="max-width:100%; border-radius: 8px; margin-top: 20px;">
-      {% endif %}
-    </div>
+    {% if summary_table %}
+      <div class="results">
+        <h3>📋 Input Summary</h3>
+        {{ summary_table | safe }}
+      </div>
     {% endif %}
+
+    <div class="log-box" id="progress-log"></div>
   </div>
+
+  <script>
+    const form = document.getElementById('main-form');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const logBox = document.getElementById('progress-log');
+      logBox.innerHTML = ''; // Clear previous output
+
+      fetch('/stream', {
+        method: 'POST',
+        body: formData,
+      }).then(response => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let content = '';
+
+        function read() {
+          reader.read().then(({ done, value }) => {
+            if (done) return;
+            const chunk = decoder.decode(value);
+            content += chunk;
+            const cleaned = chunk.replace(/^data: /gm, '').replace(/\\n/g, '');
+            logBox.innerHTML += cleaned;
+            read();
+          });
+        }
+
+        read();
+      });
+    });
+  </script>
 </body>
 </html>
