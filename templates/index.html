@@ -2,171 +2,174 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Airline Overbooking Optimization</title>
+  <title>AIRLINE OVERBOOKING OPTIMIZATION</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #eaf3fc;
+      background: linear-gradient(to bottom right, #e6f0fa, #f4f9ff);
       margin: 0;
       padding: 0;
+      font-size: 14px;
     }
-  
-    .container {
-      max-width: 1000px;
-      margin: 40px auto;
-      background-color: white;
-      padding: 30px 50px;
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    }
-  
+
     h2 {
       text-align: center;
       color: #2c3e50;
-      margin-bottom: 25px;
+      margin: 30px 0 10px;
+      font-size: 26px;
     }
-  
+
+    .container {
+      max-width: 95%;
+      margin: auto;
+      padding: 0 30px 40px;
+    }
+
     .form-grid {
       display: grid;
-      grid-template-columns: 240px 200px 240px 200px;
-      gap: 12px 12px;
+      grid-template-columns: 400px 220px 400px 220px;
+      gap: 14px 40px;
       align-items: center;
+      margin-top: 30px;
     }
-  
+
     label {
-      font-size: 13px;
       font-weight: 500;
       color: #333;
-      text-align: left;   /* align label text to the left for consistency */
-      width: 100%;
+      text-align: left;
+      font-size: 13px;
+      margin-right: 8px;
     }
-  
+
     input,
     select {
-      padding: 7px 9px;
-      font-size: 14px;
+      padding: 6px 8px;
+      font-size: 13px;
       border: 1px solid #ccc;
       border-radius: 6px;
       width: 100%;
       box-sizing: border-box;
     }
-  
+
     button {
-      margin-top: 25px;
+      margin-top: 30px;
       width: 100%;
       padding: 12px;
       background-color: #007BFF;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
     }
-  
+
     button:hover {
       background-color: #0056b3;
     }
-  
+
     .results, .log-box {
       margin-top: 30px;
       padding: 20px;
       background-color: #f1f8ff;
       border-radius: 10px;
     }
-  
+
     .log-box {
       background-color: #fffbe6;
       border: 1px solid #f0e6a6;
       font-family: monospace;
       white-space: pre-wrap;
+      font-size: 13px;
     }
-  
+
     table.summary-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 30px;
+      font-size: 13px;
     }
-  
+
     table.summary-table th, td {
       border: 1px solid #ddd;
-      padding: 8px;
+      padding: 6px;
     }
-  
+
     table.summary-table th {
       background-color: #007BFF;
       color: white;
     }
-  
+
     img.plot {
       max-width: 100%;
       border-radius: 8px;
       margin-top: 20px;
     }
-  </style>  
+  </style>
 </head>
 <body>
   <div class="container">
-    <h2>✈️ Airline Overbooking Optimization</h2>
+    <h2>✈️ AIRLINE OVERBOOKING OPTIMIZATION</h2>
+
     <form id="main-form">
       <div class="form-grid">
         {% macro val(name) -%}{{ form_values.get(name, '') }}{%- endmacro %}
         {% set required = 'required' %}
 
-        <label>Days to Departure</label>
+        <label>Days to Departure (Number of days remaining before flight)</label>
         <input name="time_steps" type="number" {{ required }} value="{{ val('time_steps') }}">
-        <label>Discount Rate</label>
+        <label>Discount Rate (Annual discount rate for revenue)</label>
         <input name="discount" type="text" {{ required }} value="{{ val('discount') }}">
 
-        <label>Coach Seats</label>
+        <label>Coach Seats (Base capacity for economy class)</label>
         <input name="n_seats_coach" type="number" {{ required }} value="{{ val('n_seats_coach') }}">
-        <label>Overbooking Limit</label>
+        <label>Overbooking Limit (Maximum extra tickets allowed beyond coach capacity)</label>
         <input name="overbook_coach" type="number" {{ required }} value="{{ val('overbook_coach') }}">
 
-        <label>Coach Price (High)</label>
+        <label>Coach Price - High (High Price for Coach)</label>
         <input name="price_coach_high" type="number" {{ required }} value="{{ val('price_coach_high') }}">
-        <label>Sell Probability</label>
+        <label>Sell Probability (Probability of sale at high coach price)</label>
         <input name="prob_coach_high" type="text" {{ required }} value="{{ val('prob_coach_high') }}">
 
-        <label>Coach Price (Low)</label>
+        <label>Coach Price - Low (Low Price for Coach)</label>
         <input name="price_coach_low" type="number" {{ required }} value="{{ val('price_coach_low') }}">
-        <label>Sell Probability</label>
+        <label>Sell Probability (Probability of sale at low coach price)</label>
         <input name="prob_coach_low" type="text" {{ required }} value="{{ val('prob_coach_low') }}">
 
-        <label>Coach Showup Prob.</label>
+        <label>Coach Showup Probability (Probability that economy passenger shows up)</label>
         <input name="showup_prob_coach" type="text" {{ required }} value="{{ val('showup_prob_coach') }}">
-        <label>First Class Showup Prob.</label>
+        <label>First Class Showup Probability (Probability that first class passenger shows up)</label>
         <input name="showup_prob_first" type="text" {{ required }} value="{{ val('showup_prob_first') }}">
 
-        <label>First Class Seats</label>
+        <label>First Class Seats (Capacity for first class)</label>
         <input name="n_seats_first" type="number" {{ required }} value="{{ val('n_seats_first') }}">
         <div></div><div></div>
 
-        <label>First Class Price (High)</label>
+        <label>First Class Price - High (High Price for First Class)</label>
         <input name="price_first_high" type="number" {{ required }} value="{{ val('price_first_high') }}">
-        <label>Sell Probability</label>
+        <label>Sell Probability (Probability of sale at high first class price)</label>
         <input name="prob_first_high" type="text" {{ required }} value="{{ val('prob_first_high') }}">
 
-        <label>First Class Price (Low)</label>
+        <label>First Class Price - Low (Low Price for First Class)</label>
         <input name="price_first_low" type="number" {{ required }} value="{{ val('price_first_low') }}">
-        <label>Sell Probability</label>
+        <label>Sell Probability (Probability of sale at low first class price)</label>
         <input name="prob_first_low" type="text" {{ required }} value="{{ val('prob_first_low') }}">
 
-        <label>If First Class is full, Boost Coach demand by (%)</label>
+        <label>Boost Coach Buy (%) (Increased coach demand if first class sells out)</label>
         <input name="coach_price_boost" type="text" {{ required }} value="{{ val('coach_price_boost') }}">
         <div></div><div></div>
 
-        <label>Upgrade Cost</label>
+        <label>Upgrade Cost (Cost to upgrade economy passenger to first class)</label>
         <input name="cost_upgrade" type="text" {{ required }} value="{{ val('cost_upgrade') }}">
-        <label>Deboard Cost</label>
+        <label>Deboard Cost (Penalty cost for removing passengers due to overbooking)</label>
         <input name="cost_off" type="text" {{ required }} value="{{ val('cost_off') }}">
 
-        <label>Seasonality</label>
+        <label>Seasonality (Adjust demand based on proximity to flight)</label>
         <select name="apply_seasonality" {{ required }}>
           <option value="True" {% if form_values.get('apply_seasonality') == 'True' %}selected{% endif %}>True</option>
           <option value="False" {% if form_values.get('apply_seasonality') == 'False' %}selected{% endif %}>False</option>
         </select>
 
-        <label>Option to Not Sell Coach</label>
+        <label>Option to Not Sell Coach (Allow system to skip economy sale)</label>
         <select name="has_option_to_not_sell" {{ required }}>
           <option value="True" {% if form_values.get('has_option_to_not_sell') == 'True' %}selected{% endif %}>True</option>
           <option value="False" {% if form_values.get('has_option_to_not_sell') == 'False' %}selected{% endif %}>False</option>
@@ -192,7 +195,7 @@
       e.preventDefault();
       const formData = new FormData(form);
       const logBox = document.getElementById('progress-log');
-      logBox.innerHTML = ''; // Clear previous output
+      logBox.innerHTML = '';
 
       fetch('/stream', {
         method: 'POST',
@@ -200,19 +203,15 @@
       }).then(response => {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let content = '';
-
         function read() {
           reader.read().then(({ done, value }) => {
             if (done) return;
             const chunk = decoder.decode(value);
-            content += chunk;
             const cleaned = chunk.replace(/^data: /gm, '').replace(/\\n/g, '');
             logBox.innerHTML += cleaned;
             read();
           });
         }
-
         read();
       });
     });
