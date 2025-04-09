@@ -79,10 +79,6 @@ We built a **Flask web app** to allow users to interactively test different over
   - Seasonality toggle
   - No-sell option toggle
 
-📸 Sample UI:
-
-> Screenshot goes here (optional).
-
 To run the app locally:
 ```bash
 pip install -r requirements.txt
