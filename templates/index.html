@@ -10,7 +10,7 @@
       margin: 0;
       padding: 0;
     }
-
+  
     .container {
       max-width: 1000px;
       margin: 40px auto;
@@ -19,27 +19,28 @@
       border-radius: 14px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     }
-
+  
     h2 {
       text-align: center;
       color: #2c3e50;
       margin-bottom: 25px;
     }
-
+  
     .form-grid {
       display: grid;
-      grid-template-columns: 260px 180px 260px 180px;
-      gap: 10px 10px;
+      grid-template-columns: 240px 200px 240px 200px;
+      gap: 12px 12px;
       align-items: center;
     }
-
+  
     label {
+      font-size: 13px;
       font-weight: 500;
       color: #333;
-      text-align: right;
-      margin-right: 8px;
+      text-align: left;   /* align label text to the left for consistency */
+      width: 100%;
     }
-
+  
     input,
     select {
       padding: 7px 9px;
@@ -49,7 +50,7 @@
       width: 100%;
       box-sizing: border-box;
     }
-
+  
     button {
       margin-top: 25px;
       width: 100%;
@@ -61,47 +62,47 @@
       border-radius: 8px;
       cursor: pointer;
     }
-
+  
     button:hover {
       background-color: #0056b3;
     }
-
+  
     .results, .log-box {
       margin-top: 30px;
       padding: 20px;
       background-color: #f1f8ff;
       border-radius: 10px;
     }
-
+  
     .log-box {
       background-color: #fffbe6;
       border: 1px solid #f0e6a6;
       font-family: monospace;
       white-space: pre-wrap;
     }
-
+  
     table.summary-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 30px;
     }
-
+  
     table.summary-table th, td {
       border: 1px solid #ddd;
       padding: 8px;
     }
-
+  
     table.summary-table th {
       background-color: #007BFF;
       color: white;
     }
-
+  
     img.plot {
       max-width: 100%;
       border-radius: 8px;
       margin-top: 20px;
     }
-  </style>
+  </style>  
 </head>
 <body>
   <div class="container">
@@ -150,7 +151,7 @@
         <label>Sell Probability</label>
         <input name="prob_first_low" type="text" {{ required }} value="{{ val('prob_first_low') }}">
 
-        <label>If First Class is filled,Boost Coach Buy (%)</label>
+        <label>If First Class is full, Boost Coach demand by (%)</label>
         <input name="coach_price_boost" type="text" {{ required }} value="{{ val('coach_price_boost') }}">
         <div></div><div></div>
 
