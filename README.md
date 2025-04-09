@@ -9,6 +9,11 @@ By modeling customer behavior, seat constraints, and overbooking penalties, the 
 📁 **Files Included**
 - `Airlines(DP).ipynb`: Python notebook implementing the DP logic and simulations.
 - `AirlinePricing.pdf`: Detailed report explaining the problem, model, assumptions, methodology, and results.
+- `app.py`: Flask web app for interactive overbooking optimization.
+- `templates/index.html`: Frontend for the web app.
+- `requirements.txt`: Python dependencies for running the app.
+- `render.yaml`: Deployment config for Render.
+- `README.md`: Project documentation.
 
 ---
 
@@ -59,6 +64,36 @@ Maximize total expected profit over a year by:
 
 ---
 
+## 🌐 Interactive Web App (Flask)
+
+We built a **Flask web app** to allow users to interactively test different overbooking configurations and instantly visualize:
+
+- Expected revenue for each overbooking level
+- Optimal overbooking policy based on inputs
+- Dynamic streaming feedback of calculations
+- Custom inputs for:
+  - Ticket prices
+  - Sell probabilities
+  - Show-up rates
+  - Upgrade and offloading costs
+  - Seasonality toggle
+  - No-sell option toggle
+
+📸 Sample UI:
+
+> Screenshot goes here (optional).
+
+To run the app locally:
+```bash
+pip install -r requirements.txt
+python app.py
+```
+Then open `http://127.0.0.1:5000/` in your browser.
+
+> 🛠️ The app was also deployed on Render: .
+
+---
+
 ## 🧪 Simulation Metrics
 
 - **Expected Profit & Std. Deviation**
@@ -75,8 +110,8 @@ Maximize total expected profit over a year by:
 |--------------------------------------|-------------|--------------|----------------------|
 | No Seasonality, No No-Sell           | 9 seats     | 42,134.62    | 3.64%                |
 | No Seasonality, With No-Sell         | 20 seats    | 42,139.89    | 3.65%                |
-| Seasonality, No No-Sell              | 9 seats     | 41,820.96    | 2.87%                |
-| Seasonality, With No-Sell (best-fit) | 20 seats    | 41,826.45    | 2.89%                |
+| Seasonality, No No-Sell              | 9 seats     | 41,820.96    | 3.64%                |
+| Seasonality, With No-Sell (best-fit) | 20 seats    | 41,826.45    | 3.65%                |
 
 ---
 
@@ -103,5 +138,3 @@ Allow **up to 20 overbooked coach seats** and **enable the no-sell option** for 
 - Sneha Sastry Rayadurgam  
 
 📍 Project for **Optimization II**, University of Texas at Austin, Spring 2025.
-
-
