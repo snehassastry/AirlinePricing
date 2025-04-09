@@ -67,7 +67,7 @@ def stream():
         ax.set_xlabel('Allowed Coach Overbook')
         ax.set_ylabel('Expected Present Value')
         ax.set_title('Expected Present Value vs Overbook Coach')
-        ax.grid(True)
+        ax.grid(False)
         graph_url = convert_plot_to_base64(fig)
 
         yield f"data: <hr><b>{result_msg}</b><br><img src='{graph_url}' class='plot'><br>\n"
