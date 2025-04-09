@@ -1,57 +1,79 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, stream_with_context, Response
 import matplotlib.pyplot as plt
 import io
 import base64
 import numpy as np
 from scipy.stats import binom
+import time
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
-    result = None
-    graph_url = None
-    form_values = {}
+    return render_template("index.html", form_values={}, summary_table=None)
 
-    if request.method == 'POST':
-        form_values = {key: request.form[key] for key in request.form}
+@app.route('/stream', methods=['POST'])
+def stream():
+    form_values = {key: request.form[key] for key in request.form}
 
-        try:
-            # Get values from form
-            time_steps = int(form_values.get("time_steps", 10))
-            n_seats_coach = int(form_values.get("n_seats_coach", 100))
-            overbook_limit = int(form_values.get("overbook_coach", 10))
-            n_seats_first = int(form_values.get("n_seats_first", 20))
-            discount = float(form_values.get("discount", 0.999))
+    @stream_with_context
+    def generate():
+        yield f"data: <b>⏳ Starting optimization...</b><br>\n"
+        time.sleep(0.5)
 
-            showup_prob_coach = float(form_values.get("showup_prob_coach", 0.95))
-            showup_prob_first = float(form_values.get("showup_prob_first", 0.97))
+        time_steps = int(form_values.get("time_steps"))
+        n_seats_coach = int(form_values.get("n_seats_coach"))
+        overbook_limit = int(form_values.get("overbook_coach"))
+        n_seats_first = int(form_values.get("n_seats_first"))
+        discount = 1 / (1 + float(form_values.get("discount")) / 365)
 
-            price_coach = [int(form_values.get("price_coach_low", 300)), int(form_values.get("price_coach_high", 350))]
-            prob_coach = [float(form_values.get("prob_coach_low", 0.65)), float(form_values.get("prob_coach_high", 0.30))]
+        showup_prob_coach = float(form_values.get("showup_prob_coach"))
+        showup_prob_first = float(form_values.get("showup_prob_first"))
 
-            price_first = [int(form_values.get("price_first_low", 425)), int(form_values.get("price_first_high", 500))]
-            prob_first = [float(form_values.get("prob_first_low", 0.08)), float(form_values.get("prob_first_high", 0.04))]
+        price_coach = [int(form_values.get("price_coach_low")), int(form_values.get("price_coach_high"))]
+        prob_coach = [float(form_values.get("prob_coach_low")), float(form_values.get("prob_coach_high"))]
 
-            coach_price_boost = float(form_values.get("coach_price_boost", 0.03))
-            cost_upgrade = float(form_values.get("cost_upgrade", 30))
-            cost_off = float(form_values.get("cost_off", 100))
+        price_first = [int(form_values.get("price_first_low")), int(form_values.get("price_first_high"))]
+        prob_first = [float(form_values.get("prob_first_low")), float(form_values.get("prob_first_high"))]
 
-            apply_seasonality = form_values.get("apply_seasonality", "True") == "True"
-            has_option_to_not_sell = form_values.get("has_option_to_not_sell", "True") == "True"
+        coach_price_boost = float(form_values.get("coach_price_boost"))
+        cost_upgrade = float(form_values.get("cost_upgrade"))
+        cost_off = float(form_values.get("cost_off"))
 
-            graph_url, result = generate_policy_plot(
-                overbook_limit, time_steps, n_seats_coach, n_seats_first,
-                discount, showup_prob_coach, showup_prob_first,
-                price_coach, prob_coach, price_first, prob_first,
-                coach_price_boost, cost_upgrade, cost_off,
-                apply_seasonality, has_option_to_not_sell
-            )
+        apply_seasonality = form_values.get("apply_seasonality") == "True"
+        has_option_to_not_sell = form_values.get("has_option_to_not_sell") == "True"
 
-        except Exception as e:
-            result = f"Error: {e}"
+        V_dict = {}
+        for ob in range(0, overbook_limit + 1):  # Start from 0 instead of 1
+            yield f"data: ⏳ Calculating overbook policy for {ob} seats...<br>\n"
+            V, _ = policy(ob, time_steps, n_seats_coach, n_seats_first, discount,
+                          showup_prob_coach, showup_prob_first,
+                          price_coach, prob_coach, price_first, prob_first,
+                          coach_price_boost, cost_upgrade, cost_off,
+                          apply_seasonality, has_option_to_not_sell)
+            V_dict[ob] = V[0, 0, 0]
+            time.sleep(0.2)
 
-    return render_template("index.html", result=result, graph_url=graph_url, form_values=form_values)
+        best = max(V_dict, key=V_dict.get)
+        best_val = V_dict[best]
+        base_val = V_dict[0]
+        improvement = ((best_val - base_val) / base_val) * 100 if base_val != 0 else 0
+
+        result_msg = (f"✅ Best overbook policy: {best} seats with expected value ${best_val:,.2f} <br>"
+                      f"📈 Improvement from 0 overbooked seats: {improvement:.2f}%")
+
+        fig, ax = plt.subplots()
+        ax.plot(list(V_dict.keys()), list(V_dict.values()), marker='o')
+        ax.set_xlabel('Allowed Coach Overbook')
+        ax.set_ylabel('Expected Present Value')
+        ax.set_title('Expected Present Value vs Overbook Coach')
+        ax.grid(True)
+        graph_url = convert_plot_to_base64(fig)
+
+        yield f"data: <hr><b>{result_msg}</b><br><img src='{graph_url}' class='plot'><br>\n"
+        yield "data: [DONE]\n\n"
+
+    return Response(generate(), mimetype='text/event-stream')
 
 def policy(overbooked_seats, time_steps, n_coach, n_first, discount,
            showup_prob_coach, showup_prob_first,
@@ -85,8 +107,11 @@ def policy(overbooked_seats, time_steps, n_coach, n_first, discount,
                         ep = 0
                         for sc in range(2):
                             for sf in range(2):
-                                prob_c = prob_coach[pc] * (0.75 + t / 730 if apply_seasonality else 1)
-                                prob_f = prob_first[pf] * (0.75 + t / 730 if apply_seasonality else 1)
+                                prob_c = prob_coach[pc]
+                                prob_f = prob_first[pf]
+                                if apply_seasonality:
+                                    prob_c *= (0.75 + t / 730)
+                                    prob_f *= (0.75 + t / 730)
                                 if f == n_first:
                                     prob_c += coach_price_boost
                                     prob_f = 0
@@ -104,9 +129,11 @@ def policy(overbooked_seats, time_steps, n_coach, n_first, discount,
                     for pf in range(2):
                         ep = 0
                         for sf in range(2):
-                            prob_f = prob_first[pf] * (0.75 + t / 730 if apply_seasonality else 1)
+                            prob_f = prob_first[pf]
                             if f == n_first:
                                 prob_f = 0
+                            if apply_seasonality:
+                                prob_f *= (0.75 + t / 730)
                             pf_prob = prob_f if sf else 1 - prob_f
                             next_f = min(f+sf, n_first)
                             reward = sf * price_first[pf]
@@ -117,27 +144,18 @@ def policy(overbooked_seats, time_steps, n_coach, n_first, discount,
                 U[t, c, f] = np.argmax(profits)
     return V, U
 
-def generate_policy_plot(overbook_limit, *args):
-    V_dict = {}
-    for ob in range(1, overbook_limit + 1):
-        V, _ = policy(ob, *args)
-        V_dict[ob] = V[0, 0, 0]
-
-    fig, ax = plt.subplots()
-    ax.plot(list(V_dict.keys()), list(V_dict.values()), marker='o')
-    ax.set_xlabel('Allowed Coach Overbook')
-    ax.set_ylabel('Expected Present Value')
-    ax.set_title('Expected Present Value vs Overbook Coach')
-    ax.grid(True)
-
-    best = max(V_dict, key=V_dict.get)
-    return convert_plot_to_base64(fig), f"Best overbook policy is {best} seats with expected value ${V_dict[best]:,.2f}"
-
 def convert_plot_to_base64(fig):
     buf = io.BytesIO()
     fig.savefig(buf, format='png', bbox_inches='tight')
     buf.seek(0)
-    return f'data:image/png;base64,{base64.b64encode(buf.read()).decode("utf-8")}'
+    return f"data:image/png;base64,{base64.b64encode(buf.read()).decode('utf-8')}"
+
+def build_summary_table(form):
+    html = "<table class='summary-table'><tr><th>Parameter</th><th>Value</th></tr>"
+    for key, val in form.items():
+        html += f"<tr><td>{key.replace('_',' ').title()}</td><td>{val}</td></tr>"
+    html += "</table>"
+    return html
 
 import os
 
